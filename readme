@@ -1,0 +1,25 @@
+# Comandos para enviar la imagen a ecr de aws
+
+# Recupere un token de autenticación y autentique su cliente de Docker en el registro. Use AWS CLI:
+
+```bash
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 331913104701.dkr.ecr.us-east-1.amazonaws.com
+```
+
+Nota: Si recibe un error al utilizar AWS CLI, asegúrese de tener instaladas las últimas versiones de AWS CLI y Docker.## Cree una imagen de Docker con el siguiente comando. Para obtener información sobre cómo crear un archivo de Docker desde cero, consulte las instrucciones aquí . Puede omitir este paso si ya se creó la imagen:
+
+```
+docker build -t faktu/export-report-directory .
+```
+
+## Cuando se complete la creación, etiquete la imagen para poder enviarla a este repositorio:
+
+```
+docker tag faktu/export-report-directory:latest 331913104701.dkr.ecr.us-east-1.amazonaws.com/faktu/export-report-directory:latest
+```
+
+## Para testing
+
+```
+curl -XPOST "http://localhost:9002/2015-03-31/functions/function/invocations" -d '{"statuses": "[7,8]", "path": "export/due/reporte_test.xlsx"}'
+```
