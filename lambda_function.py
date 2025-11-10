@@ -79,7 +79,8 @@ def handler(event, context):
         if unit:
             where_clauses.append(f"directory_udc.unidad = '{unit}'")
         if search:
-            where_clauses.append(f"(directory.company_name = '{search}')")
+            where_clauses.append(f"(directory.company_name = '{search}' OR directory.rut = '{search}')")
+            
         # Ejecutar una consulta SQL para obtener los datos
         query = """
             SELECT 
