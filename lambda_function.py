@@ -34,7 +34,7 @@ def upload_file_s3(path, bucket, object_name=None):
     try:
         connection = get_db_connection()
         cursor = connection.cursor(pymysql.cursors.DictCursor)
-        with open('/tmp/reporte_facturas_payment.xlsx', 'rb') as file:
+        with open('/tmp/reporte_directory.xlsx', 'rb') as file:
             s3_client.upload_fileobj(
                 file,
                 os.getenv('S3_BUCKET'),
@@ -63,6 +63,7 @@ def handler(event, context):
         types = event.get('type', '')
         unit = event.get('unit', '')
         search = event.get('search', '')
+        path = event.get('path', '')
 
         # Conectar a la base de datos
         connection = get_db_connection()
@@ -113,7 +114,7 @@ def handler(event, context):
 
         # Escribir las cabeceras
         headers = [
-            '#','Tipo','Sector de la empresa','Nombre','Rut','Telefono','email','Giro','Direccion','Comuna','Web',
+            'Tipo','Sector de la empresa','Nombre','Rut','Telefono','email','Giro','Direccion','Comuna','Web',
             'Cod unidad de compra','Unidad de compra','region unidad de compra',
             'Nombre de contacto','Departamento del contacto','Cargo del contacto','Telefono','email'
         ]
@@ -122,28 +123,27 @@ def handler(event, context):
             ws.cell(row=1, column=col_num, value=header)
         # Escribir los datos en la hoja de cálculo
         for row_index, row in enumerate(results, start=2):
-            ws.cell(row=row_index, column=1, value=row.get('udc_id')) # Empresa
-            ws.cell(row=row_index, column=2, value=row.get('type')) # empresa
-            ws.cell(row=row_index, column=3, value=row.get('type_bussiness')) # deudor
-            ws.cell(row=row_index, column=4, value=row.get('company_name')) # Asunto
-            ws.cell(row=row_index, column=5, value=row.get('rut')) # Deudor
-            ws.cell(row=row_index, column=6, value=row.get('phone')) # Rut de deudor
-            ws.cell(row=row_index, column=7, value=row.get('email')) # Tipo Documento
-            ws.cell(row=row_index, column=8, value=row.get('giro'))  # Tipo Documento
-            ws.cell(row=row_index, column=9, value=row.get('address'))  # Tipo Documento
-            ws.cell(row=row_index, column=10, value=row.get('comuna'))  # Tipo Documento
-            ws.cell(row=row_index, column=11, value=row.get('web'))  # Tipo Documento
-            ws.cell(row=row_index, column=12, value=row.get('cod_unidad')) # Tipo Documento
-            ws.cell(row=row_index, column=13, value=row.get('unidad')) # Tipo Documento
-            ws.cell(row=row_index, column=14, value=row.get('region_unidad')) # Tipo Documento
-            ws.cell(row=row_index, column=15, value=row.get('udc_contact_name')) # Tipo Documento
-            ws.cell(row=row_index, column=16, value=row.get('departament'))  # Tipo Documento
-            ws.cell(row=row_index, column=17, value=row.get('cargo')) # N° Folio
-            ws.cell(row=row_index, column=18, value=row.get('udc_contact_phone')) # Fecha ingreso
-            ws.cell(row=row_index, column=19, value= row.get('udc_contact_email')) # Tipo de servicio
+            ws.cell(row=row_index, column=1, value=row.get('type')) # empresa
+            ws.cell(row=row_index, column=2, value=row.get('type_bussiness')) # deudor
+            ws.cell(row=row_index, column=3, value=row.get('company_name')) # Asunto
+            ws.cell(row=row_index, column=4, value=row.get('rut')) # Deudor
+            ws.cell(row=row_index, column=5, value=row.get('phone')) # Rut de deudor
+            ws.cell(row=row_index, column=6, value=row.get('email')) # Tipo Documento
+            ws.cell(row=row_index, column=7, value=row.get('giro'))  # Tipo Documento
+            ws.cell(row=row_index, column=8, value=row.get('address'))  # Tipo Documento
+            ws.cell(row=row_index, column=9, value=row.get('comuna'))  # Tipo Documento
+            ws.cell(row=row_index, column=10, value=row.get('web'))  # Tipo Documento
+            ws.cell(row=row_index, column=11, value=row.get('cod_unidad', 'N/A')) # Tipo Documento
+            ws.cell(row=row_index, column=12, value=row.get('unidad', 'N/A')) # Tipo Documento
+            ws.cell(row=row_index, column=13, value=row.get('region_unidad', 'N/A')) # Tipo Documento
+            ws.cell(row=row_index, column=14, value=row.get('udc_contact_name', 'N/A')) # Tipo Documento
+            ws.cell(row=row_index, column=15, value=row.get('departament', 'N/A'))  # Tipo Documento
+            ws.cell(row=row_index, column=16, value=row.get('cargo', 'N/A')) # N° Folio
+            ws.cell(row=row_index, column=17, value=row.get('udc_contact_phone', 'N/A')) # Fecha ingreso
+            ws.cell(row=row_index, column=18, value=row.get('udc_contact_email', 'N/A')) # Tipo de servicio
         # Guardar el archivo Excel localmente
-        wb.save('/tmp/reporte_facturas_directory.xlsx')
-        print("Archivo Excel generado exitosamente: reporte_facturas_directory.xlsx")
+        wb.save('/tmp/reporte_directory.xlsx')
+        print("Archivo Excel generado exitosamente: reporte_directory.xlsx")
 
         upload_file_s3(path, os.getenv('S3_BUCKET'))
 
