@@ -63,7 +63,7 @@ def handler(event, context):
         types = event.get('type', '')
         unit = event.get('unit', '')
         search = event.get('search', '')
-        path = event.get('path', '')
+        path = event.get('path', '') 
 
         # Conectar a la base de datos
         connection = get_db_connection()
